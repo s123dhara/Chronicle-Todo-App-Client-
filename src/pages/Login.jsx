@@ -2,10 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
-
 import { Button, Card } from '../components/UI';
-
-const API_BASE = 'http://localhost:5000/api/v1';
+import config from '../config';
 
 export default function Login() {
   const { colors, fetchTasks } = useApp();
@@ -41,7 +39,7 @@ export default function Login() {
     setLoading(true);
     
     try {
-      const response = await fetch(`${API_BASE}/auth/login`, {
+      const response = await fetch(`${config.api.baseURL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -3,8 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
 import { Button, Card } from '../components/UI';
-
-const API_BASE = 'http://localhost:5000/api/v1';
+import config from '../config';
 
 export default function Signup() {
   const { colors, fetchTasks } = useApp();
@@ -53,7 +52,7 @@ export default function Signup() {
     setLoading(true);
     
     try {
-      const response = await fetch(`${API_BASE}/auth/register`, {
+      const response = await fetch(`${config.api.baseURL}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

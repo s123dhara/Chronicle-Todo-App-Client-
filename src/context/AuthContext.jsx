@@ -1,9 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import config from '../config';
 
 const AuthContext = createContext();
-
-const API_BASE = 'http://localhost:5000/api/v1';
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -13,13 +12,13 @@ export function AuthProvider({ children }) {
   // Check if user is logged in on mount
   useEffect(() => {
     const checkAuth = async () => {
-      const token = localStorage.getItem('chronicle-access-token');
-      const storedUser = localStorage.getItem('chronicle-user');
+      const token = localStorage.getItem(config.auth.tokenKey);
+      const storedUser = localStorage.getItem(config.auth.userKey);
 
       if (token && storedUser) {
         try {
           // Verify token is still valid by fetching user
-          const response = await fetch(`${API_BASE}/auth/me`, {
+          const response = await fetch(`${config.api.baseURL}/auth/me`, {
             headers: {
               'Authorization': `Bearer ${token}`,
             },
@@ -43,23 +42,23 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = (userData, accessToken, refreshToken) => {
-    localStorage.setItem('chronicle-access-token', accessToken);
-    localStorage.setItem('chronicle-refresh-token', refreshToken);
-    localStorage.setItem('chronicle-user', JSON.stringify(userData));
+    localStorage.setItem(config.auth.tokenKey, accessToken);
+    localStorage.setItem(config.auth.refreshTokenKey, refreshToken);
+    localStorage.setItem(config.auth.userKey, JSON.stringify(userData));
     setUser(userData);
   };
 
   const logout = async () => {
-    const refreshToken = localStorage.getItem('chronicle-refresh-token');
+    const refreshToken = localStorage.getItem(config.auth.refreshTokenKey);
     
     // Call backend logout
     if (refreshToken) {
       try {
-        await fetch(`${API_BASE}/auth/logout`, {
+        await fetch(`${config.api.baseURL}/auth/logout`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('chronicle-access-token')}`,
+            'Authorization': `Bearer ${localStorage.getItem(config.auth.tokenKey)}`,
           },
           body: JSON.stringify({ refreshToken }),
         });
@@ -69,9 +68,9 @@ export function AuthProvider({ children }) {
     }
 
     // Clear local storage
-    localStorage.removeItem('chronicle-access-token');
-    localStorage.removeItem('chronicle-refresh-token');
-    localStorage.removeItem('chronicle-user');
+    localStorage.removeItem(config.auth.tokenKey);
+    localStorage.removeItem(config.auth.refreshTokenKey);
+    localStorage.removeItem(config.auth.userKey);
     setUser(null);
     navigate('/login');
   };
